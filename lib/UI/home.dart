@@ -57,6 +57,11 @@ class _HomeState extends State<Home> {
               return TodoTile(
                   taskName: toDoList[index][0],
                   taskStatus: toDoList[index][1],
+                  delete: () {
+                    setState(() {
+                      toDoList.removeAt(index);
+                    });
+                  },
                   onChange: (value) {
                     setState(() {
                       toDoList[index][1] = !toDoList[index][1];
