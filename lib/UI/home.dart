@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/UI/dialog_box.dart';
 import 'package:todo_list/UI/todo_tile.dart';
+import 'package:todo_list/shared/data.dart';
 import 'package:todo_list/shared/logic.dart';
 
 import '../shared/theme.dart';
@@ -14,14 +15,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final _controller = TextEditingController();
-
-  List toDoList = [
-    ["task1", false],
-    ["task2", false],
-  ];
+  MyData db = MyData();
+  
 
   @override
   Widget build(BuildContext context) {
+    
+    db.loadData();
+
     return Scaffold(
         backgroundColor: theme().scaffoldBackgroundColor,
         appBar: AppBar(
@@ -41,8 +42,9 @@ class _HomeState extends State<Home> {
                     controller: _controller,
                     save: () {
                       setState(() {
-                        Logic().save(toDoList, _controller);
+                        Logic().save(db.toDoList, _controller);
                       });
+                      db.updateData();
                       Navigator.of(context).pop();
                     },
                   );
@@ -52,15 +54,22 @@ class _HomeState extends State<Home> {
           child: const Icon(Icons.add),
         ),
         body: ListView.builder(
-            itemCount: toDoList.length,
+            itemCount: db.toDoList.length,
             itemBuilder: (context, index) {
               return TodoTile(
-                  taskName: toDoList[index][0],
-                  taskStatus: toDoList[index][1],
+                  taskName: db.toDoList[index][0],
+                  taskStatus: db.toDoList[index][1],
+                  delete: () {
+                    setState(() {
+                      db.toDoList.removeAt(index);
+                    });
+                    db.updateData();
+                  },
                   onChange: (value) {
                     setState(() {
-                      toDoList[index][1] = !toDoList[index][1];
+                      db.toDoList[index][1] = !db.toDoList[index][1];
                     });
+                    db.updateData();
                   });
             }));
   }
