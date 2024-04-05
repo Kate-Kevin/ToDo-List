@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo_list/UI/dialog_box.dart';
 import 'package:todo_list/UI/todo_tile.dart';
 import 'package:todo_list/shared/data.dart';
@@ -15,13 +16,23 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final _controller = TextEditingController();
+  final _myBox = Hive.box('mybox');
   MyData db = MyData();
-  
+
+  @override
+  void initState(){
+    if (_myBox.get('TODOLIST')==null) {
+      db.createInitioalData();
+    }else{
+      db.loadData();
+    }
+
+    super.initState();
+
+  }
 
   @override
   Widget build(BuildContext context) {
-    
-    db.loadData();
 
     return Scaffold(
         backgroundColor: theme().scaffoldBackgroundColor,

@@ -5,6 +5,10 @@ class MyData{
 
   final _myBox = Hive.box('mybox');
 
+  void createInitioalData(){
+    toDoList = [];
+  }
+
   void loadData(){
     toDoList = _myBox.get('TODOLIST');
   }
