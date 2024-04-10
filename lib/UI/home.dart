@@ -19,6 +19,7 @@ class _HomeState extends State<Home> {
   final _myBox = Hive.box('mybox');
   MyData db = MyData();
 
+  final listKey = GlobalKey<AnimatedListState>();
   @override
   void initState(){
     if (_myBox.get('TODOLIST')==null) {
@@ -30,10 +31,8 @@ class _HomeState extends State<Home> {
     super.initState();
 
   }
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
         backgroundColor: theme().scaffoldBackgroundColor,
         appBar: AppBar(
@@ -57,6 +56,8 @@ class _HomeState extends State<Home> {
                       });
                       db.updateData();
                       Navigator.of(context).pop();
+                      _controller.clear();
+                      listKey.currentState!.insertItem(0);
                     },
                   );
                 });
@@ -64,17 +65,30 @@ class _HomeState extends State<Home> {
           backgroundColor: theme().canvasColor,
           child: const Icon(Icons.add),
         ),
-        body: ListView.builder(
-            itemCount: db.toDoList.length,
-            itemBuilder: (context, index) {
+        body: AnimatedList(
+            key: listKey,
+            initialItemCount: db.toDoList.length,
+            itemBuilder: (context, index, animation) {
               return TodoTile(
+                  animation: animation,
                   taskName: db.toDoList[index][0],
                   taskStatus: db.toDoList[index][1],
                   delete: () {
                     setState(() {
-                      db.toDoList.removeAt(index);
+                      final itemRemove= db.toDoList[index];
+
+                      db.deleteData(db.toDoList, index);
+
+                      listKey.currentState!.removeItem(
+                        index,
+                        (context, animation) => TodoTile(
+                            taskName: itemRemove[0],
+                            taskStatus: itemRemove[1],
+                            onChange: (value) {},
+                            delete: () {},
+                            animation: animation),
+                      );
                     });
-                    db.updateData();
                   },
                   onChange: (value) {
                     setState(() {

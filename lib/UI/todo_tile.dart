@@ -4,8 +4,9 @@ import 'package:todo_list/shared/theme.dart';
 class TodoTile extends StatelessWidget {
   final String taskName;
   final bool taskStatus;
-  final Function(bool?)? onChange;
+  final Function(bool?) onChange;
   final Function delete;
+  final Animation<double> animation;
 
   const TodoTile({
     super.key,
@@ -13,26 +14,27 @@ class TodoTile extends StatelessWidget {
     required this.taskStatus,
     required this.onChange,
     required this.delete,
+    required this.animation,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(25, 25, 25, 0),
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-            color: theme().canvasColor,
-            borderRadius: BorderRadius.circular(12)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Checkbox(
+    return SizeTransition(
+      sizeFactor: animation,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(25, 25, 25, 0),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+              color: theme().canvasColor,
+              borderRadius: BorderRadius.circular(12)),
+          child: ListTile(
+            leading: Checkbox(
               value: taskStatus,
               onChanged: onChange,
               activeColor: theme().primaryColorDark,
             ),
-            SizedBox(
+            title: SizedBox(
               width: MediaQuery.of(context).size.width - 200,
               child: Text(
                 taskName,
@@ -46,20 +48,20 @@ class TodoTile extends StatelessWidget {
                     decorationThickness: 4),
               ),
             ),
-            PopupMenuButton(
+            trailing: PopupMenuButton(
               itemBuilder: (context) => [
                 const PopupMenuItem(
                   value: 'delete',
                   child: Text('Delete'),
                 )
               ],
-              onSelected: (value){
-                if(value == 'delete'){
+              onSelected: (value) {
+                if (value == 'delete') {
                   delete();
                 }
               },
             ),
-          ],
+          ),
         ),
       ),
     );
